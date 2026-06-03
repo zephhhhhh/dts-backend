@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.dev.dto.CreateTaskBody;
+import uk.gov.hmcts.reform.dev.dto.UpdateTaskStatusBody;
 import uk.gov.hmcts.reform.dev.models.TaskEntity;
 import uk.gov.hmcts.reform.dev.service.TaskService;
 
@@ -13,15 +14,15 @@ import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
 
-// -    Create a task with the following properties:
+// X    Create a task with the following properties:
 //          Title
 //          Description (optional field)
 //          Status
 //          Due date/time
 // X    Retrieve a task by ID
 // X    Retrieve all tasks
-// -    Update the status of a task
-// -    Delete a task
+// X    Update the status of a task
+// X    Delete a task
 
 @RestController
 @RequiredArgsConstructor
@@ -57,28 +58,33 @@ public class TasksController {
     }
 
     @PostMapping(value = "/create")
-    public ResponseEntity<TaskEntity> createNewTask(@RequestBody CreateTaskBody taskBody) {
 
-        log.debug(":POST:createNewTask: creating a new task entity: {}", taskBody.toPrettyJson());
+    public ResponseEntity<Long> createNewTask(@RequestBody CreateTaskBody createTaskBody) {
 
-        // TODO: Implement this.
-        return null;
+        log.debug(":POST:createNewTask: creating a new task entity: {}", createTaskBody.toPrettyJson());
+
+        Long createdTaskId = taskService.createNewTask(createTaskBody);
+
+        return ok(createdTaskId);
     }
 
-    // TODO: Unsure whether to use the status in the path or as a request body.
     @PatchMapping(value = "/update/{taskId}")
-    public ResponseEntity<TaskEntity> updateTaskStatus(@PathVariable Long taskId) {
-        log.debug(":PATCH:updateTaskStatus: updating task status with id: {}", taskId);
+    public ResponseEntity<TaskEntity> updateTaskStatus(@PathVariable Long taskId, @RequestBody UpdateTaskStatusBody newStatusBody) {
+        log.debug(":PATCH:updateTaskStatus: updating task status with id: {}, new status: {}", taskId, newStatusBody.getStatus());
 
-        // TODO: Implement this.
-        return null;
+        TaskEntity updatedTask = taskService.updateTaskStatus(taskId, newStatusBody);
+
+        return ok(updatedTask);
     }
 
     @DeleteMapping(value = "/delete/{taskId}")
     public ResponseEntity<TaskEntity> deleteTask(@PathVariable Long taskId) {
         log.debug(":DELETE:deleteTask: deleting task with id: {}", taskId);
 
-        // TODO: Implement this.
-        return null;
+        // TODO: Unsure on the convention of deleting entities, just going to return the deleted entity if it was deleted for now.
+
+        TaskEntity deletedTask = taskService.deleteTask(taskId);
+
+        return ok(deletedTask);
     }
 }

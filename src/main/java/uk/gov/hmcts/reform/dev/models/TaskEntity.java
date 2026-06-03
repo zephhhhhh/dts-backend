@@ -3,10 +3,7 @@
 
 package uk.gov.hmcts.reform.dev.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +18,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tasks")
 public class TaskEntity {
+    // TODO: Auto increment for now, potentially bad design (allows enumerating tasks), maybe use GUID?
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(name = "title", length = 200, nullable = false)
