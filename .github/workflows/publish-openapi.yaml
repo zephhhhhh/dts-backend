@@ -1,14 +1,54 @@
-name: Publish OpenAPI specs
+name: Publish Docs to GH Pages
 on:
   push:
-    branches:
-      - "master"
+    branches: [ "master" ]
+
+permissions:
+  contents: write
 
 jobs:
-  publish-openapi:
-    uses: hmcts/workflow-publish-openapi-spec/.github/workflows/publish-openapi.yml@v1
-    secrets:
-      SWAGGER_PUBLISHER_API_TOKEN: ${{ secrets.SWAGGER_PUBLISHER_API_TOKEN }}
-    with:
-      test_to_run: 'uk.gov.hmcts.reform.dev.openapi.OpenAPIPublisherTest'
-      java_version: 17
+  publish-openapi-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Generate OpenAPI spec
+        run: ./gradlew integration --tests "uk.gov.hmcts.reform.dev.openapi.OpenAPIPublisherTest"
+
+      - name: Create Swagger site
+        run: |
+          mkdir -p site
+          cp /tmp/openapi-specs.json site/openapi.json
+          cat > site/index.html <<'HTML'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <title>API documentation</title>
+            <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+          </head>
+          <body>
+            <div id="swagger-ui"></div>
+            <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+            <script>
+              window.ui = SwaggerUIBundle({
+                url: './openapi.json',
+                dom_id: '#swagger-ui'
+              });
+            </script>
+          </body>
+          </html>
+          HTML
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          publish_branch: gh-pages
