@@ -53,7 +53,7 @@ class CrudFunctionalTest {
             .contentType(ContentType.JSON)
             .body(body)
             .when()
-            .post("tasks/create")
+            .post("tasks/")
             .then()
             .extract()
             .response();
@@ -73,7 +73,7 @@ class CrudFunctionalTest {
             .contentType(ContentType.JSON)
             .body(body)
             .when()
-            .post("tasks/create")
+            .post("tasks/")
             .then()
             .extract()
             .response();

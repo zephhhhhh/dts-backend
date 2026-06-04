@@ -52,7 +52,7 @@ public class TasksController {
         return ok(taskService.getAllTasks());
     }
 
-    @PostMapping(value = "/create")
+    @PostMapping(value = "/")
     @Operation(
         summary = "Creates a new Task Entity in the DB based upon data in the request body.",
         description = "Returns the taskId of the task task that was created."

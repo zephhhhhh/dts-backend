@@ -36,17 +36,32 @@ public class TaskService {
     public Long createNewTask(CreateTaskBody task) {
         log.debug(":createNewTask");
 
+        String title = task.getTitle();
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Task must have a title.");
+        }
+
+        String status = task.getStatus();
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("Task must have a status.");
+        }
+
+        LocalDateTime dueDate = task.getDueDate();
+        if (dueDate == null) {
+            throw new IllegalArgumentException("Task must have a due date.");
+        }
+
         TaskEntity newTask = new TaskEntity();
-        newTask.setTitle(task.getTitle());
+        newTask.setTitle(title);
 
         // TODO: Allow null or default construct to an empty string?
         // TODO: Is there a Java equivalent of String.Empty?
         String newDescription = task.getDescription();
         newTask.setDescription(newDescription == null ? "" : newDescription);
 
-        newTask.setStatus(task.getStatus());
+        newTask.setStatus(status);
         newTask.setCreatedDate(LocalDateTime.now());
-        newTask.setDueDate(task.getDueDate());
+        newTask.setDueDate(dueDate);
 
         TaskEntity created = repo.save(newTask);
 
