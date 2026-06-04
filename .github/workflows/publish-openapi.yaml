@@ -39,7 +39,8 @@ jobs:
             <script>
               window.ui = SwaggerUIBundle({
                 url: './openapi.json',
-                dom_id: '#swagger-ui'
+                dom_id: '#swagger-ui',
+                supportedSubmitMethods: []
               });
             </script>
           </body>
