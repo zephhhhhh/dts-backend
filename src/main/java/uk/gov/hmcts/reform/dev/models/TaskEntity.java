@@ -3,7 +3,12 @@
 
 package uk.gov.hmcts.reform.dev.models;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +25,7 @@ import java.time.LocalDateTime;
 public class TaskEntity {
     // TODO: Auto increment for now, potentially bad design (allows enumerating tasks), maybe use GUID?
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "title", length = 200, nullable = false)
@@ -40,4 +45,8 @@ public class TaskEntity {
 
     @Column(name = "due_date")
     private LocalDateTime dueDate;
+
+    public boolean hasDescription() {
+        return description != null && !description.isBlank();
+    }
 }

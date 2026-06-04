@@ -84,6 +84,9 @@ task functional(type: Test) {
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
+  
+  systemProperty 'spring.datasource.url', 'jdbc:sqlite:build/functional-test.db'
+  systemProperty 'spring.jpa.hibernate.ddl-auto', 'create-drop'
 }
 
 task integration(type: Test) {

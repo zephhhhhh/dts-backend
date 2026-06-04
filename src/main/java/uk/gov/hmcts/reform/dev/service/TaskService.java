@@ -36,7 +36,12 @@ public class TaskService {
 
         TaskEntity newTask = new TaskEntity();
         newTask.setTitle(task.getTitle());
-        newTask.setDescription(task.getDescription());
+
+        // TODO: Allow null or default construct to an empty string?
+        // TODO: Is there a Java equivalent of String.Empty?
+        String newDescription = task.getDescription();
+        newTask.setDescription(newDescription == null ? "" : newDescription);
+
         newTask.setStatus(task.getStatus());
         newTask.setCreatedDate(LocalDateTime.now());
         newTask.setDueDate(task.getDueDate());
