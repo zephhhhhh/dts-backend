@@ -15,7 +15,7 @@ import java.util.Map;
 import static io.restassured.RestAssured.given;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class CRUDFunctionalTest {
+class CrudFunctionalTest {
     protected static final String CONTENT_TYPE_VALUE = "application/json";
 
     // TODO: I think this should load the port from the .env?
