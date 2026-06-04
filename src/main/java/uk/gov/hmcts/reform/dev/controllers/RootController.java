@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dev.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @Slf4j(topic = "RootController")
 public class RootController {
     @GetMapping("/")
+    @Operation(summary = "Health test endpoint, prints a welcome message.")
     public ResponseEntity<String> welcome() {
         return ok("Welcome to test-backend");
     }

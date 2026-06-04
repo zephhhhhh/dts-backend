@@ -18,20 +18,9 @@ import uk.gov.hmcts.reform.dev.dto.UpdateTaskStatusBody;
 import uk.gov.hmcts.reform.dev.models.TaskEntity;
 import uk.gov.hmcts.reform.dev.service.TaskService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
-
-// X    Create a task with the following properties:
-//          Title
-//          Description (optional field)
-//          Status
-//          Due date/time
-// X    Retrieve a task by ID
-// X    Retrieve all tasks
-// X    Update the status of a task
-// X    Delete a task
 
 @RestController
 @RequiredArgsConstructor
@@ -41,20 +30,10 @@ import static org.springframework.http.ResponseEntity.ok;
 public class TasksController {
     private final TaskService taskService;
 
-    @GetMapping(value = "/get-example-task", produces = "application/json")
-    public ResponseEntity<TaskEntity> getExampleCase() {
-        return ok(new TaskEntity(
-            1L,
-            "Example title",
-            "Example description",
-            "In progress",
-            LocalDateTime.now(),
-            LocalDateTime.now().plusDays(1)
-        ));
-    }
-
     @GetMapping(value = "/{taskId}", produces = "application/json")
-    @Operation(summary = "Returns the task for a given taskId.")
+    @Operation(
+        summary = "Returns the task for a given taskId."
+    )
     public ResponseEntity<TaskEntity> getTaskById(
         @PathVariable Long taskId
     ) {
@@ -64,7 +43,9 @@ public class TasksController {
     }
 
     @GetMapping(value = "/all", produces = "application/json")
-    @Operation(summary = "Returns a collection of all the tasks.")
+    @Operation(
+        summary = "Returns a collection of all the tasks."
+    )
     public ResponseEntity<List<TaskEntity>> getAllTasks() {
         log.debug(":GET:getAllTasks: fetching all tasks");
 
@@ -72,7 +53,10 @@ public class TasksController {
     }
 
     @PostMapping(value = "/create")
-    @Operation(summary = "Creates a new Task Entity in the DB based upon data in the request body.")
+    @Operation(
+        summary = "Creates a new Task Entity in the DB based upon data in the request body.",
+        description = "Returns the taskId of the task task that was created."
+    )
     public ResponseEntity<Long> createNewTask(
         @RequestBody CreateTaskBody createTaskBody
     ) {
@@ -85,7 +69,10 @@ public class TasksController {
     }
 
     @PatchMapping(value = "/{taskId}")
-    @Operation(summary = "Updates an existing Task Entity in the DB with a new status in the request body.")
+    @Operation(
+        summary = "Updates an existing Task Entity in the DB with a new status in the request body.",
+        description = "Returns the updated state of the updated Task Entity, if an entity was updated."
+    )
     public ResponseEntity<TaskEntity> updateTaskStatus(
         @PathVariable Long taskId,
         @RequestBody UpdateTaskStatusBody newStatusBody
@@ -99,7 +86,10 @@ public class TasksController {
     }
 
     @DeleteMapping(value = "/{taskId}")
-    @Operation(summary = "Deletes the Task for a given taskId.")
+    @Operation(
+        summary = "Deletes the Task for a given taskId.",
+        description = "Returns the Task Entity that was deleted, if any entity was deleted."
+    )
     public ResponseEntity<TaskEntity> deleteTask(
         @PathVariable Long taskId
     ) {
