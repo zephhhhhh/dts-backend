@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dev.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +54,7 @@ public class TasksController {
     }
 
     @GetMapping(value = "/{taskId}", produces = "application/json")
+    @Operation(summary = "Returns the task for a given taskId.")
     public ResponseEntity<TaskEntity> getTaskById(
         @PathVariable Long taskId
     ) {
@@ -62,6 +64,7 @@ public class TasksController {
     }
 
     @GetMapping(value = "/all", produces = "application/json")
+    @Operation(summary = "Returns a collection of all the tasks.")
     public ResponseEntity<List<TaskEntity>> getAllTasks() {
         log.debug(":GET:getAllTasks: fetching all tasks");
 
@@ -69,7 +72,7 @@ public class TasksController {
     }
 
     @PostMapping(value = "/create")
-
+    @Operation(summary = "Creates a new Task Entity in the DB based upon data in the request body.")
     public ResponseEntity<Long> createNewTask(
         @RequestBody CreateTaskBody createTaskBody
     ) {
@@ -82,6 +85,7 @@ public class TasksController {
     }
 
     @PatchMapping(value = "/{taskId}")
+    @Operation(summary = "Updates an existing Task Entity in the DB with a new status in the request body.")
     public ResponseEntity<TaskEntity> updateTaskStatus(
         @PathVariable Long taskId,
         @RequestBody UpdateTaskStatusBody newStatusBody
@@ -95,6 +99,7 @@ public class TasksController {
     }
 
     @DeleteMapping(value = "/{taskId}")
+    @Operation(summary = "Deletes the Task for a given taskId.")
     public ResponseEntity<TaskEntity> deleteTask(
         @PathVariable Long taskId
     ) {
