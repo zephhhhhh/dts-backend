@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.dev.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.dev.dto.CreateTaskBody;
@@ -16,6 +17,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j(topic = "TaskService")
+@Qualifier("taskService")
 public class TaskService {
     private final TaskRepository repo;
 

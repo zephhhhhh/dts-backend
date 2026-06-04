@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.dev.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -7,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
+@Tag(name = "Root Controller")
+@Slf4j(topic = "RootController")
 public class RootController {
     @GetMapping("/")
     public ResponseEntity<String> welcome() {

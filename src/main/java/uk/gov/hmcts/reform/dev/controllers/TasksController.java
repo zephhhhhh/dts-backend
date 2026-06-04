@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dev.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequiredArgsConstructor
 @RequestMapping("/tasks")
 @Slf4j(topic = "TasksController")
+@Tag(name = "Tasks Controller")
 public class TasksController {
     private final TaskService taskService;
 
