@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.dev.models.TaskStatus;
 
 import java.time.LocalDateTime;
 
@@ -25,8 +26,7 @@ public class CreateTaskBody implements ToJsonString {
 
     @JsonProperty("status")
     @NotNull
-    @Size(min = 1)
-    private String status;
+    private TaskStatus status;
 
     // TODO: Maybe verify this date is in the future?
     @JsonProperty("due_date")

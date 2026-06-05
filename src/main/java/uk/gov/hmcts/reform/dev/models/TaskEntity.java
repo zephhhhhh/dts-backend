@@ -5,6 +5,8 @@ package uk.gov.hmcts.reform.dev.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,7 +39,8 @@ public class TaskEntity {
     // TODO: My gut is telling me to make this an enum, but it is unclear if status may be user defined
     //       and not just 'in progress' and 'completed'
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
 
     // TODO: This is not in the spec, but in general having a created date is useful.
     @Column(name = "created_date")

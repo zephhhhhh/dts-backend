@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import uk.gov.hmcts.reform.dev.models.TaskStatus;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -41,7 +42,7 @@ class CrudFunctionalTest {
         Assertions.assertTrue(response.asString().startsWith("Welcome"));
     }
 
-    private Long createTask(String title, String description, String status, String dueDate) {
+    private Long createTask(String title, String description, TaskStatus status, String dueDate) {
         Map<String, Object> body = Map.of(
             "title", title,
             "description", description,
@@ -62,7 +63,7 @@ class CrudFunctionalTest {
         return response.as(Long.class);
     }
 
-    private Long createTask(String title, String status, String dueDate) {
+    private Long createTask(String title, TaskStatus status, String dueDate) {
         Map<String, Object> body = Map.of(
             "title", title,
             "status", status,
@@ -100,7 +101,7 @@ class CrudFunctionalTest {
         Long createdId = createTask(
             "New task",
             "A task description",
-            "To do",
+            TaskStatus.TODO,
             LocalDateTime.now().toString()
         );
 
@@ -112,7 +113,7 @@ class CrudFunctionalTest {
         Long createdId = createTask(
             "Read a task",
             "Fetch it back by id",
-            "To do",
+            TaskStatus.TODO,
             LocalDateTime.now().toString()
         );
 
@@ -128,7 +129,7 @@ class CrudFunctionalTest {
         Assertions.assertEquals(createdId.intValue(), response.jsonPath().getInt("id"));
         Assertions.assertEquals("Read a task", response.jsonPath().getString("title"));
         Assertions.assertEquals("Fetch it back by id", response.jsonPath().getString("description"));
-        Assertions.assertEquals("To do", response.jsonPath().getString("status"));
+        Assertions.assertEquals("TODO", response.jsonPath().getString("status"));
     }
 
     @Test
@@ -149,7 +150,7 @@ class CrudFunctionalTest {
         Long createdId = createTask(
             "Appear in the list",
             "Should be returned by /all",
-            "To do",
+            TaskStatus.TODO,
             LocalDateTime.now().toString()
         );
 
@@ -172,7 +173,7 @@ class CrudFunctionalTest {
     void createTaskWithNoDescription() {
         Long createdId = createTask(
             "No description",
-            "To do",
+            TaskStatus.STARTED,
             LocalDateTime.now().toString()
         );
 
@@ -188,7 +189,7 @@ class CrudFunctionalTest {
         Assertions.assertEquals(createdId.intValue(), response.jsonPath().getInt("id"));
         Assertions.assertEquals("No description", response.jsonPath().getString("title"));
         Assertions.assertEquals("", response.jsonPath().getString("description"));
-        Assertions.assertEquals("To do", response.jsonPath().getString("status"));
+        Assertions.assertEquals("STARTED", response.jsonPath().getString("status"));
     }
 
     @Test
@@ -196,13 +197,13 @@ class CrudFunctionalTest {
         Long createdId = createTask(
             "Update my status",
             "Status should change",
-            "To do",
+            TaskStatus.COMPLETED,
             LocalDateTime.now().toString()
         );
 
         Response response = given()
             .contentType(ContentType.JSON)
-            .body(Map.of("status", "Completed"))
+            .body(Map.of("status", "COMPLETED"))
             .when()
             .patch("tasks/" + createdId)
             .then()
@@ -211,7 +212,7 @@ class CrudFunctionalTest {
 
         Assertions.assertEquals(200, response.statusCode());
         Assertions.assertEquals(createdId.intValue(), response.jsonPath().getInt("id"));
-        Assertions.assertEquals("Completed", response.jsonPath().getString("status"));
+        Assertions.assertEquals("COMPLETED", response.jsonPath().getString("status"));
     }
 
     @Test
@@ -219,7 +220,7 @@ class CrudFunctionalTest {
         Long createdId = createTask(
             "Delete me",
             "Should be removed",
-            "To do",
+            TaskStatus.TODO,
             LocalDateTime.now().toString()
         );
 

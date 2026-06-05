@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.dev.models.TaskStatus;
 
 @Data
 @NoArgsConstructor
@@ -14,5 +15,5 @@ public class UpdateTaskStatusBody implements ToJsonString {
     @JsonProperty("status")
     @NotNull
     @Size(min = 1)
-    private String status;
+    private TaskStatus status;
 }

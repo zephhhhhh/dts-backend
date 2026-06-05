@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.dev.dto.CreateTaskBody;
 import uk.gov.hmcts.reform.dev.dto.UpdateTaskStatusBody;
 import uk.gov.hmcts.reform.dev.models.TaskEntity;
+import uk.gov.hmcts.reform.dev.models.TaskStatus;
 import uk.gov.hmcts.reform.dev.repository.TaskRepository;
 
 import java.time.LocalDateTime;
@@ -41,8 +42,8 @@ public class TaskService {
             throw new IllegalArgumentException("Task must have a title.");
         }
 
-        String status = task.getStatus();
-        if (status == null || status.isBlank()) {
+        TaskStatus status = task.getStatus();
+        if (status == null) {
             throw new IllegalArgumentException("Task must have a status.");
         }
 
