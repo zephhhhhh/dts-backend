@@ -7,8 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import uk.gov.hmcts.reform.dev.exception.JsonSchemaValidationException;
 
 @Slf4j(topic = "GlobalExceptionHandler")
 @ControllerAdvice
@@ -51,6 +53,31 @@ public class GlobalExceptionHandler {
             HttpStatus.BAD_REQUEST,
             "Bad Request",
             "Invalid arguments were provided in the request",
+            false
+        );
+        return responseWithProblemDetail(HttpStatus.BAD_REQUEST, problemDetail);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ProblemDetail> handleHttpMessageNotReadableException(
+        HttpMessageNotReadableException ex) {
+
+        ProblemDetail problemDetail = createProblemDetail(
+            HttpStatus.BAD_REQUEST,
+            "Bad Request",
+            "The request body could not be read. It may be missing or invalid JSON.",
+            false
+        );
+
+        return responseWithProblemDetail(HttpStatus.BAD_REQUEST, problemDetail);
+    }
+
+    @ExceptionHandler(JsonSchemaValidationException.class)
+    public ResponseEntity<ProblemDetail> handleJsonSchemaValidationException(JsonSchemaValidationException e) {
+        ProblemDetail problemDetail = createProblemDetail(
+            HttpStatus.BAD_REQUEST,
+            "Bad Request",
+            "The request does not conform to the required JSON schema",
             false
         );
         return responseWithProblemDetail(HttpStatus.BAD_REQUEST, problemDetail);

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.dev.SchemaPaths;
+import uk.gov.hmcts.reform.dev.annotation.JsonSchemaValidated;
 import uk.gov.hmcts.reform.dev.dto.CreateTaskBody;
 import uk.gov.hmcts.reform.dev.dto.UpdateTaskStatusBody;
 import uk.gov.hmcts.reform.dev.models.TaskEntity;
@@ -21,6 +24,10 @@ import uk.gov.hmcts.reform.dev.service.TaskService;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
+
+// TODO: Figure out if I can remove the 'is_never_used' warning for these methods.
+//       Potentially will be fixed once unit tests for the controller are implemented
+//       (Not over the network)?
 
 @RestController
 @RequiredArgsConstructor
@@ -58,6 +65,7 @@ public class TasksController {
         description = "Returns the taskId of the task task that was created."
     )
     public ResponseEntity<Long> createNewTask(
+        @JsonSchemaValidated(schemaPath = SchemaPaths.CREATE_TASK_REQUEST)
         @RequestBody CreateTaskBody createTaskBody
     ) {
 
@@ -65,7 +73,7 @@ public class TasksController {
 
         Long createdTaskId = taskService.createNewTask(createTaskBody);
 
-        return ok(createdTaskId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskId);
     }
 
     @PatchMapping(value = "/{taskId}")
@@ -75,6 +83,7 @@ public class TasksController {
     )
     public ResponseEntity<TaskEntity> updateTaskStatus(
         @PathVariable Long taskId,
+        @JsonSchemaValidated(schemaPath = SchemaPaths.UPDATE_TASK_STATUS_REQUEST)
         @RequestBody UpdateTaskStatusBody newStatusBody
     ) {
         log.debug(":PATCH:updateTaskStatus: updating task status with id: {}, new status: {}",

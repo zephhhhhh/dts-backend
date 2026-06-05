@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": ["string", "null"]
+    },
+    "status": {
+      "$ref": "resource:/jsonSchemas/tasks/taskStatus.json"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["title", "status", "due_date"],
+  "additionalProperties": false
+}

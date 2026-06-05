@@ -84,7 +84,7 @@ task functional(type: Test) {
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
-  
+
   systemProperty 'spring.datasource.url', 'jdbc:sqlite:build/functional-test.db'
   systemProperty 'spring.jpa.hibernate.ddl-auto', 'create-drop'
 }
@@ -157,7 +157,10 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.17'
+
+  implementation 'com.networknt:json-schema-validator:1.5.9'
 
   // Copied following 2 lines from 'hmcts/opal-fines-service'
   implementation "org.springframework.boot:spring-boot-starter-data-jpa"

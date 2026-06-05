@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.dev.dto.CreateTaskBody;
 import uk.gov.hmcts.reform.dev.models.TaskStatus;
 
 import java.time.LocalDateTime;
@@ -17,8 +19,6 @@ import static io.restassured.RestAssured.given;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class CrudFunctionalTest {
-    protected static final String CONTENT_TYPE_VALUE = "application/json";
-
     // TODO: I think this should load the port from the .env?
     @Value("${TEST_URL:http://localhost:4000}")
     private String testUrl;
@@ -42,44 +42,24 @@ class CrudFunctionalTest {
         Assertions.assertTrue(response.asString().startsWith("Welcome"));
     }
 
-    private Long createTask(String title, String description, TaskStatus status, String dueDate) {
-        Map<String, Object> body = Map.of(
-            "title", title,
-            "description", description,
-            "status", status,
-            "due_date", dueDate
-        );
-
-        Response response = given()
-            .contentType(ContentType.JSON)
-            .body(body)
-            .when()
-            .post("tasks/")
-            .then()
-            .extract()
-            .response();
-
-        Assertions.assertEquals(200, response.statusCode());
-        return response.as(Long.class);
+    private void assertStatus(Response response, HttpStatus status) {
+        Assertions.assertEquals(status.value(), response.statusCode());
     }
 
-    private Long createTask(String title, TaskStatus status, String dueDate) {
-        Map<String, Object> body = Map.of(
-            "title", title,
-            "status", status,
-            "due_date", dueDate
-        );
+    private Long createTask(String title, String description, TaskStatus status, LocalDateTime dueDate) {
+        CreateTaskBody createTaskBody = new CreateTaskBody(title, description, status, dueDate);
 
         Response response = given()
             .contentType(ContentType.JSON)
-            .body(body)
+            .body(createTaskBody.toJson())
             .when()
-            .post("tasks/")
+            .post("/tasks/")
             .then()
             .extract()
             .response();
 
-        Assertions.assertEquals(200, response.statusCode());
+        assertStatus(response, HttpStatus.CREATED);
+
         return response.as(Long.class);
     }
 
@@ -102,7 +82,7 @@ class CrudFunctionalTest {
             "New task",
             "A task description",
             TaskStatus.TODO,
-            LocalDateTime.now().toString()
+            LocalDateTime.now()
         );
 
         Assertions.assertNotNull(createdId);
@@ -114,13 +94,13 @@ class CrudFunctionalTest {
             "Read a task",
             "Fetch it back by id",
             TaskStatus.TODO,
-            LocalDateTime.now().toString()
+            LocalDateTime.now()
         );
 
         Response response = given()
             .contentType(ContentType.JSON)
             .when()
-            .get("tasks/" + createdId)
+            .get("/tasks/" + createdId)
             .then()
             .extract()
             .response();
@@ -137,7 +117,7 @@ class CrudFunctionalTest {
         Response response = given()
             .contentType(ContentType.JSON)
             .when()
-            .get("tasks/99999999")
+            .get("/tasks/99999999")
             .then()
             .extract()
             .response();
@@ -151,13 +131,13 @@ class CrudFunctionalTest {
             "Appear in the list",
             "Should be returned by /all",
             TaskStatus.TODO,
-            LocalDateTime.now().toString()
+            LocalDateTime.now()
         );
 
         Response response = given()
             .contentType(ContentType.JSON)
             .when()
-            .get("tasks/all")
+            .get("/tasks/all")
             .then()
             .extract()
             .response();
@@ -173,14 +153,15 @@ class CrudFunctionalTest {
     void createTaskWithNoDescription() {
         Long createdId = createTask(
             "No description",
+            null,
             TaskStatus.STARTED,
-            LocalDateTime.now().toString()
+            LocalDateTime.now()
         );
 
         Response response = given()
             .contentType(ContentType.JSON)
             .when()
-            .get("tasks/" + createdId)
+            .get("/tasks/" + createdId)
             .then()
             .extract()
             .response();
@@ -198,14 +179,14 @@ class CrudFunctionalTest {
             "Update my status",
             "Status should change",
             TaskStatus.COMPLETED,
-            LocalDateTime.now().toString()
+            LocalDateTime.now()
         );
 
         Response response = given()
             .contentType(ContentType.JSON)
             .body(Map.of("status", "COMPLETED"))
             .when()
-            .patch("tasks/" + createdId)
+            .patch("/tasks/" + createdId)
             .then()
             .extract()
             .response();
@@ -221,13 +202,13 @@ class CrudFunctionalTest {
             "Delete me",
             "Should be removed",
             TaskStatus.TODO,
-            LocalDateTime.now().toString()
+            LocalDateTime.now()
         );
 
         Response deleteResponse = given()
             .contentType(ContentType.JSON)
             .when()
-            .delete("tasks/" + createdId)
+            .delete("/tasks/" + createdId)
             .then()
             .extract()
             .response();
@@ -238,7 +219,7 @@ class CrudFunctionalTest {
         Response getResponse = given()
             .contentType(ContentType.JSON)
             .when()
-            .get("tasks/" + createdId)
+            .get("/tasks/" + createdId)
             .then()
             .extract()
             .response();

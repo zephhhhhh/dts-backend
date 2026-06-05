@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.dev.dto.CreateTaskBody;
 import uk.gov.hmcts.reform.dev.dto.UpdateTaskStatusBody;
 import uk.gov.hmcts.reform.dev.models.TaskEntity;
-import uk.gov.hmcts.reform.dev.models.TaskStatus;
 import uk.gov.hmcts.reform.dev.repository.TaskRepository;
 
 import java.time.LocalDateTime;
@@ -34,35 +33,20 @@ public class TaskService {
     }
 
     @Transactional
-    public Long createNewTask(CreateTaskBody task) {
+    public Long createNewTask(CreateTaskBody newTaskDesc) {
         log.debug(":createNewTask");
 
-        String title = task.getTitle();
-        if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("Task must have a title.");
-        }
-
-        TaskStatus status = task.getStatus();
-        if (status == null) {
-            throw new IllegalArgumentException("Task must have a status.");
-        }
-
-        LocalDateTime dueDate = task.getDueDate();
-        if (dueDate == null) {
-            throw new IllegalArgumentException("Task must have a due date.");
-        }
+        // Note: This should..? be pre-validated from the endpoint,
+        // maybe we want to place the validation in this function instead
+        // to ensure any use of this is validated?
+        // TODO: Reference HMCTS to check on convention for this.
 
         TaskEntity newTask = new TaskEntity();
-        newTask.setTitle(title);
-
-        // TODO: Allow null or default construct to an empty string?
-        // TODO: Is there a Java equivalent of String.Empty?
-        String newDescription = task.getDescription();
-        newTask.setDescription(newDescription == null ? "" : newDescription);
-
-        newTask.setStatus(status);
+        newTask.setTitle(newTaskDesc.getTitle());
+        newTask.setDescription(newTaskDesc.hasDescription() ? newTaskDesc.getDescription() : "");
+        newTask.setStatus(newTaskDesc.getStatus());
         newTask.setCreatedDate(LocalDateTime.now());
-        newTask.setDueDate(dueDate);
+        newTask.setDueDate(newTaskDesc.getDueDate());
 
         TaskEntity created = repo.save(newTask);
 

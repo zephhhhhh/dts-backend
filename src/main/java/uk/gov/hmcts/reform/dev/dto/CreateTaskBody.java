@@ -32,4 +32,8 @@ public class CreateTaskBody implements ToJsonString {
     @JsonProperty("due_date")
     @NotNull
     private LocalDateTime dueDate;
+
+    public boolean hasDescription() {
+        return description != null && !description.trim().isBlank();
+    }
 }
