@@ -1,97 +1,18 @@
 package uk.gov.hmcts.reform.dev.controllers;
 
 import io.swagger.v3.core.util.Json;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import uk.gov.hmcts.reform.dev.dto.CreateTaskBody;
+
 import uk.gov.hmcts.reform.dev.models.TaskStatus;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("integration")
-class TasksControllerPostTest {
-    @Autowired
-    private transient MockMvc mockMvc;
-
-    private Long getCreatedTaskId(ResultActions result) throws UnsupportedEncodingException {
-        return Long.parseLong(result.andReturn().getResponse().getContentAsString());
-    }
-
-    private void validateValidTaskId(ResultActions result) {
-        Assertions.assertDoesNotThrow(() -> {
-            getCreatedTaskId(result);
-        });
-    }
-
-    private ResultActions createTaskRaw(
-        String title,
-        String description,
-        String status,
-        String dueDate
-    ) throws Exception {
-        Map<String, Object> body = new HashMap<>();
-        body.put("title", title);
-        body.put("status", status);
-        body.put("due_date", dueDate);
-        if (description != null) {
-            body.put("description", description);
-        }
-
-        return mockMvc.perform(
-            post("/tasks/")
-                .contentType("application/json")
-                .content(Json.pretty(body))
-        );
-    }
-
-    private ResultActions createTask(
-        String title,
-        String description,
-        TaskStatus status,
-        LocalDateTime dueDate
-    ) throws Exception {
-        CreateTaskBody createTaskBody = new CreateTaskBody();
-        createTaskBody.setTitle(title);
-        createTaskBody.setDescription(description);
-        createTaskBody.setStatus(status);
-        createTaskBody.setDueDate(dueDate);
-
-        return mockMvc.perform(
-            post("/tasks/")
-                .contentType("application/json")
-                .content(createTaskBody.toJson())
-        );
-    }
-
-    private ResultActions validateCreatedTask(
-        ResultActions result,
-        boolean shouldFail
-    ) throws Exception {
-        if (shouldFail) {
-            result.andExpect(status().is4xxClientError());
-        } else {
-            result.andExpect(status().isCreated());
-            validateValidTaskId(result);
-        }
-
-        return result;
-    }
-
+@DisplayName("TasksControllerPostTest")
+class TasksControllerPostTest extends CommonTasksControllerTest {
     @DisplayName("A well-formed task creation request should succeed with status 201.")
     @Test
     void typicalTaskCreationSucceeds() throws Exception {
@@ -235,5 +156,21 @@ class TasksControllerPostTest {
             ),
             false
         );
+    }
+
+    @DisplayName("Task creation with an empty body should fail.")
+    @Test
+    void taskCreationWithEmptyBodyFails() throws Exception {
+        mockMvc.perform(post("/tasks/"))
+            .andExpect(status().is4xxClientError());
+    }
+
+    @DisplayName("Task creation with an incorrect content-type should fail.")
+    @Test
+    void taskCreationWithIncorrectContentTypeFails() throws Exception {
+        mockMvc.perform(post("/tasks/")
+                .contentType("text/html; charset=utf-8")
+                .content("random text"))
+            .andExpect(status().is4xxClientError());
     }
 }

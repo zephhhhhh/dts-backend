@@ -3,6 +3,7 @@
 
 package uk.gov.hmcts.reform.dev.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,9 +45,11 @@ public class TaskEntity {
 
     // TODO: This is not in the spec, but in general having a created date is useful.
     @Column(name = "created_date")
+    @JsonProperty("created_date")
     private LocalDateTime createdDate;
 
     @Column(name = "due_date")
+    @JsonProperty("due_date")
     private LocalDateTime dueDate;
 
     public boolean hasDescription() {

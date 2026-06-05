@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.dev.dto.CreateTaskBody;
+import uk.gov.hmcts.reform.dev.dto.CreateTaskResponse;
 import uk.gov.hmcts.reform.dev.models.TaskStatus;
 
 import java.time.LocalDateTime;
@@ -60,7 +61,7 @@ class CrudFunctionalTest {
 
         assertStatus(response, HttpStatus.CREATED);
 
-        return response.as(Long.class);
+        return response.as(CreateTaskResponse.class).getId();
     }
 
     @Test
@@ -68,7 +69,7 @@ class CrudFunctionalTest {
         Response response = given()
             .contentType(ContentType.JSON)
             .when()
-            .get("tasks/all")
+            .get("tasks/")
             .then()
             .extract()
             .response();
@@ -137,7 +138,7 @@ class CrudFunctionalTest {
         Response response = given()
             .contentType(ContentType.JSON)
             .when()
-            .get("/tasks/all")
+            .get("/tasks/")
             .then()
             .extract()
             .response();

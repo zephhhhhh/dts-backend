@@ -1,127 +1,60 @@
 package uk.gov.hmcts.reform.dev.controllers;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
+
 import org.springframework.test.web.servlet.ResultActions;
-import uk.gov.hmcts.reform.dev.dto.CreateTaskBody;
+
+import uk.gov.hmcts.reform.dev.SchemaPaths;
 import uk.gov.hmcts.reform.dev.models.TaskStatus;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("integration")
-class TasksControllerGetTest {
-    @Autowired
-    private transient MockMvc mockMvc;
-
-    private Long getCreatedTaskId(ResultActions result) throws UnsupportedEncodingException {
-        return Long.parseLong(result.andReturn().getResponse().getContentAsString());
-    }
-
-    private void validateValidTaskId(ResultActions result) {
-        Assertions.assertDoesNotThrow(() -> {
-            getCreatedTaskId(result);
-        });
-    }
-
-    private ResultActions createTask(
-        String title,
-        String description,
-        TaskStatus status,
-        LocalDateTime dueDate
-    ) throws Exception {
-        CreateTaskBody createTaskBody = new CreateTaskBody();
-        createTaskBody.setTitle(title);
-        createTaskBody.setDescription(description);
-        createTaskBody.setStatus(status);
-        createTaskBody.setDueDate(dueDate);
-
-        return mockMvc.perform(
-            post("/tasks/")
-                .contentType("application/json")
-                .content(createTaskBody.toJson())
-        );
-    }
-
-    private ResultActions validateCreatedTask(
-        ResultActions result,
-        boolean shouldFail
-    ) throws Exception {
-        if (shouldFail) {
-            result.andExpect(status().is4xxClientError());
-        } else {
-            result.andExpect(status().isCreated());
-            validateValidTaskId(result);
-        }
-
-        return result;
-    }
-
+@DisplayName("TasksControllerGetTest")
+class TasksControllerGetTest extends CommonTasksControllerTest {
     @DisplayName("Fetching all tasks while there are no tasks should return an empty list.")
     @Test
     void getTasksWhileEmptySucceeds() throws Exception {
-        ResultActions result = mockMvc.perform(
-            get("/tasks/all")
-        );
-
-        result.andExpect(status().isOk());
+        getAllTasks();
     }
 
     @DisplayName("Fetching a task that does exists works.")
     @Test
     void getTaskByIdSucceeds() throws Exception {
-        LocalDateTime dueDate = LocalDateTime.now().withNano(0);
-
         ResultActions createResult = validateCreatedTask(
             createTask(
                 "Valid",
                 "Valid",
                 TaskStatus.TODO,
-                dueDate
+                TEST_TIME
             ),
             false
         );
+        Long id = createdId(createResult.andReturn());
 
-        Long createdId = getCreatedTaskId(createResult);
-
-        ResultActions result = mockMvc.perform(
-            get("/tasks/" + createdId)
-                .contentType("application/json")
-        );
-
-        result.andExpect(status().isOk())
-            .andExpect(jsonPath("id").value(createdId))
+        mockMvc.perform(get("/tasks/" + id).contentType("application/json"))
+            .andExpect(status().isOk())
+            .andExpect(conformsToSchema(SchemaPaths.TASK_ENTITY))
+            .andExpect(jsonPath("id").value(id))
             .andExpect(jsonPath("title").value("Valid"))
             .andExpect(jsonPath("description").value("Valid"))
             .andExpect(jsonPath("status").value(TaskStatus.TODO.toString()))
-            .andExpect(jsonPath("dueDate").value(dueDate.toString()));
+            .andExpect(jsonPath("due_date").value(TEST_TIME.toString()));
     }
 
     @DisplayName("Fetching a task that does not exist fails.")
     @Test
     void getInvalidTaskFails() throws Exception {
-        ResultActions result = mockMvc.perform(
-            get("/tasks/" + Long.MAX_VALUE)
-                .contentType("application/json")
-        );
-
-        result.andExpect(status().isNotFound());
+        mockMvc.perform(get("/tasks/" + Long.MAX_VALUE)
+                .contentType("application/json"))
+            .andExpect(status().isNotFound());
     }
 
     @DisplayName("Fetching all tasks after adding a task contains the added task.")
@@ -136,15 +69,9 @@ class TasksControllerGetTest {
             ),
             false
         );
+        Long id = createdId(createResult.andReturn());
 
-        Long createdId = getCreatedTaskId(createResult);
-
-        ResultActions result = mockMvc.perform(
-            get("/tasks/all")
-        );
-
-        result.andExpect(status().isOk())
-            .andExpect(jsonPath("$[*].id", hasItem(createdId.intValue())));
+        getAllTasks().andExpect(jsonPath("$[*].id", hasItem(id.intValue())));
     }
 
     @DisplayName("Fetching all tasks after deleting a task removes the added task.")
@@ -159,27 +86,14 @@ class TasksControllerGetTest {
             ),
             false
         );
+        Long id = createdId(createResult.andReturn());
 
-        Long createdId = getCreatedTaskId(createResult);
+        getAllTasks().andExpect(jsonPath("$[*].id", hasItem(id.intValue())));
 
-        ResultActions result = mockMvc.perform(
-            get("/tasks/all")
-        );
+        mockMvc.perform(delete("/tasks/" + id))
+            .andExpect(status().isOk())
+            .andExpect(conformsToSchema(SchemaPaths.TASK_ENTITY));
 
-        result.andExpect(status().isOk())
-            .andExpect(jsonPath("$[*].id", hasItem(createdId.intValue())));
-
-        ResultActions deletedResult = mockMvc.perform(
-            delete("/tasks/" + createdId)
-        );
-
-        deletedResult.andExpect(status().isOk());
-
-        ResultActions afterDeleteResult = mockMvc.perform(
-            get("/tasks/all")
-        );
-
-        afterDeleteResult.andExpect(status().isOk())
-            .andExpect(jsonPath("$[*].id", not(hasItem(createdId.intValue()))));
+        getAllTasks().andExpect(jsonPath("$[*].id", not(hasItem(id.intValue()))));
     }
 }

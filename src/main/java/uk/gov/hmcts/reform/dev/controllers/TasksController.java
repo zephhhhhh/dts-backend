@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.dev.SchemaPaths;
 import uk.gov.hmcts.reform.dev.annotation.JsonSchemaValidated;
 import uk.gov.hmcts.reform.dev.dto.CreateTaskBody;
+import uk.gov.hmcts.reform.dev.dto.CreateTaskResponse;
 import uk.gov.hmcts.reform.dev.dto.UpdateTaskStatusBody;
 import uk.gov.hmcts.reform.dev.models.TaskEntity;
 import uk.gov.hmcts.reform.dev.service.TaskService;
@@ -49,7 +50,7 @@ public class TasksController {
         return ok(taskService.getTaskById(taskId));
     }
 
-    @GetMapping(value = "/all", produces = "application/json")
+    @GetMapping(value = "/", produces = "application/json")
     @Operation(
         summary = "Returns a collection of all the tasks."
     )
@@ -64,7 +65,7 @@ public class TasksController {
         summary = "Creates a new Task Entity in the DB based upon data in the request body.",
         description = "Returns the taskId of the task task that was created."
     )
-    public ResponseEntity<Long> createNewTask(
+    public ResponseEntity<CreateTaskResponse> createNewTask(
         @JsonSchemaValidated(schemaPath = SchemaPaths.CREATE_TASK_REQUEST)
         @RequestBody CreateTaskBody createTaskBody
     ) {
@@ -73,7 +74,7 @@ public class TasksController {
 
         Long createdTaskId = taskService.createNewTask(createTaskBody);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateTaskResponse(createdTaskId));
     }
 
     @PatchMapping(value = "/{taskId}")
