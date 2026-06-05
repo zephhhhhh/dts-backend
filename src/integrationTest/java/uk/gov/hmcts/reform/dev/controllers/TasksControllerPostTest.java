@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.dev.controllers;
 
-import io.swagger.v3.core.util.Json;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
