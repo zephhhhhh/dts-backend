@@ -21,7 +21,7 @@ API documentation in the form of Swagger docs have been hosted as github pages a
 |--------|-----------------|------------------------|
 | GET    | /tasks/all      | List all tasks         |
 | GET    | /tasks/{taskId} | Get a task by ID       |
-| POST   | /tasks/create   | Create a task          |
+| POST   | /tasks/         | Create a task          |
 | PATCH  | /tasks/{taskId} | Update a task's status |
 | DELETE | /tasks/{taskId} | Delete a task          |
 
