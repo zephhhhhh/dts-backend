@@ -48,8 +48,9 @@ This project uses SQLite instead of PostgresQL,
 mostly due to configuration issues of PostgresQL not wanting to run
 correctly on my machine.
 
-The default database name is `tasks.db`, a temporary database `functional-test.db`
-is created for running tests and is dropped after execution.
+The default database name is `tasks.db`, there are 2 temporary databases
+`functional-test.db` & `integration-test.db` respectively created
+for running tests and are dropped after execution.
 
 The SQLite database is accessed in the same way as the PostgresQL database in
 other HMCTS repositories.
