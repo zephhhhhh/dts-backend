@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.dev;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +17,12 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+// TODO: Document these tests.
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class CrudFunctionalTest {
     // TODO: I think this should load the port from the .env?
@@ -30,8 +35,13 @@ class CrudFunctionalTest {
         RestAssured.useRelaxedHTTPSValidation();
     }
 
+
+    private void assertStatus(HttpStatus status, Response response) {
+        assertEquals(status.value(), response.statusCode());
+    }
+
     @Test
-    void functionalTest() {
+    void welcomeReturnsWelcomeMessage() {
         Response response = given()
             .contentType(ContentType.JSON)
             .when()
@@ -39,12 +49,8 @@ class CrudFunctionalTest {
             .then()
             .extract().response();
 
-        Assertions.assertEquals(200, response.statusCode());
-        Assertions.assertTrue(response.asString().startsWith("Welcome"));
-    }
-
-    private void assertStatus(Response response, HttpStatus status) {
-        Assertions.assertEquals(status.value(), response.statusCode());
+        assertStatus(HttpStatus.OK, response);
+        assertTrue(response.asString().startsWith("Welcome"));
     }
 
     private Long createTask(String title, String description, TaskStatus status, LocalDateTime dueDate) {
@@ -59,7 +65,7 @@ class CrudFunctionalTest {
             .extract()
             .response();
 
-        assertStatus(response, HttpStatus.CREATED);
+        assertStatus(HttpStatus.CREATED, response);
 
         return response.as(CreateTaskResponse.class).getId();
     }
@@ -74,7 +80,7 @@ class CrudFunctionalTest {
             .extract()
             .response();
 
-        Assertions.assertEquals(200, response.statusCode());
+        assertStatus(HttpStatus.OK, response);
     }
 
     @Test
@@ -86,7 +92,7 @@ class CrudFunctionalTest {
             LocalDateTime.now()
         );
 
-        Assertions.assertNotNull(createdId);
+        assertNotNull(createdId);
     }
 
     @Test
@@ -106,11 +112,11 @@ class CrudFunctionalTest {
             .extract()
             .response();
 
-        Assertions.assertEquals(200, response.statusCode());
-        Assertions.assertEquals(createdId.intValue(), response.jsonPath().getInt("id"));
-        Assertions.assertEquals("Read a task", response.jsonPath().getString("title"));
-        Assertions.assertEquals("Fetch it back by id", response.jsonPath().getString("description"));
-        Assertions.assertEquals("TODO", response.jsonPath().getString("status"));
+        assertStatus(HttpStatus.OK, response);
+        assertEquals(createdId.intValue(), response.jsonPath().getInt("id"));
+        assertEquals("Read a task", response.jsonPath().getString("title"));
+        assertEquals("Fetch it back by id", response.jsonPath().getString("description"));
+        assertEquals("TODO", response.jsonPath().getString("status"));
     }
 
     @Test
@@ -123,7 +129,7 @@ class CrudFunctionalTest {
             .extract()
             .response();
 
-        Assertions.assertNotEquals(200, response.statusCode());
+        assertStatus(HttpStatus.NOT_FOUND, response);
     }
 
     @Test
@@ -143,8 +149,8 @@ class CrudFunctionalTest {
             .extract()
             .response();
 
-        Assertions.assertEquals(200, response.statusCode());
-        Assertions.assertTrue(
+        assertStatus(HttpStatus.OK, response);
+        assertTrue(
             response.jsonPath().getList("id").contains(createdId.intValue()),
             "Expected /tasks/all to contain the newly created task id"
         );
@@ -167,11 +173,11 @@ class CrudFunctionalTest {
             .extract()
             .response();
 
-        Assertions.assertEquals(200, response.statusCode());
-        Assertions.assertEquals(createdId.intValue(), response.jsonPath().getInt("id"));
-        Assertions.assertEquals("No description", response.jsonPath().getString("title"));
-        Assertions.assertEquals("", response.jsonPath().getString("description"));
-        Assertions.assertEquals("STARTED", response.jsonPath().getString("status"));
+        assertStatus(HttpStatus.OK, response);
+        assertEquals(createdId.intValue(), response.jsonPath().getInt("id"));
+        assertEquals("No description", response.jsonPath().getString("title"));
+        assertEquals("", response.jsonPath().getString("description"));
+        assertEquals("STARTED", response.jsonPath().getString("status"));
     }
 
     @Test
@@ -192,9 +198,9 @@ class CrudFunctionalTest {
             .extract()
             .response();
 
-        Assertions.assertEquals(200, response.statusCode());
-        Assertions.assertEquals(createdId.intValue(), response.jsonPath().getInt("id"));
-        Assertions.assertEquals("COMPLETED", response.jsonPath().getString("status"));
+        assertStatus(HttpStatus.OK, response);
+        assertEquals(createdId.intValue(), response.jsonPath().getInt("id"));
+        assertEquals("COMPLETED", response.jsonPath().getString("status"));
     }
 
     @Test
@@ -214,8 +220,8 @@ class CrudFunctionalTest {
             .extract()
             .response();
 
-        Assertions.assertEquals(200, deleteResponse.statusCode());
-        Assertions.assertEquals(createdId.intValue(), deleteResponse.jsonPath().getInt("id"));
+        assertStatus(HttpStatus.OK, deleteResponse);
+        assertEquals(createdId.intValue(), deleteResponse.jsonPath().getInt("id"));
 
         Response getResponse = given()
             .contentType(ContentType.JSON)
@@ -225,6 +231,6 @@ class CrudFunctionalTest {
             .extract()
             .response();
 
-        Assertions.assertNotEquals(200, getResponse.statusCode());
+        assertStatus(HttpStatus.NOT_FOUND, getResponse);
     }
 }
