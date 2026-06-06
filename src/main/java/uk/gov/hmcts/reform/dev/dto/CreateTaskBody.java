@@ -28,7 +28,6 @@ public class CreateTaskBody implements ToJsonString {
     @NotNull
     private TaskStatus status;
 
-    // TODO: Maybe verify this date is in the future?
     @JsonProperty("due_date")
     @NotNull
     private LocalDateTime dueDate;

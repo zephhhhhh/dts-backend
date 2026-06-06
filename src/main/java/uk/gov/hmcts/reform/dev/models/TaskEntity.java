@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 @Data
 @Table(name = "tasks")
 public class TaskEntity {
-    // TODO: Auto increment for now, potentially bad design (allows enumerating tasks), maybe use GUID?
+    // NOTE: Auto increment for now, potentially bad design (allows enumerating tasks), maybe use GUID?
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,13 +40,11 @@ public class TaskEntity {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    // TODO: My gut is telling me to make this an enum, but it is unclear if status may be user defined
-    //       and not just 'in progress' and 'completed'
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
-    // TODO: This is not in the spec, but in general having a created date is useful.
+    // NOTE: This is not in the spec, but in general having a created date is useful.
     @Column(name = "created_date")
     @JsonProperty("created_date")
     private LocalDateTime createdDate;

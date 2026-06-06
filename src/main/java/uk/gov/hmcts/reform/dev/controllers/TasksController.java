@@ -26,10 +26,6 @@ import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
 
-// TODO: Figure out if I can remove the 'is_never_used' warning for these methods.
-//       Potentially will be fixed once unit tests for the controller are implemented
-//       (Not over the network)?
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/tasks")

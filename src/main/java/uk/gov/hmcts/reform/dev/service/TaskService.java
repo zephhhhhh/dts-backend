@@ -36,11 +36,6 @@ public class TaskService {
     public Long createNewTask(CreateTaskBody newTaskDesc) {
         log.debug(":createNewTask");
 
-        // Note: This should..? be pre-validated from the endpoint,
-        // maybe we want to place the validation in this function instead
-        // to ensure any use of this is validated?
-        // TODO: Reference HMCTS to check on convention for this.
-
         TaskEntity newTask = new TaskEntity();
         newTask.setTitle(newTaskDesc.getTitle());
         newTask.setDescription(newTaskDesc.hasDescription() ? newTaskDesc.getDescription() : "");
@@ -65,7 +60,6 @@ public class TaskService {
     @Transactional
     public TaskEntity deleteTask(Long taskId) throws EntityNotFoundException {
         TaskEntity taskToDelete = getTaskById(taskId);
-        // TODO: Exception handling? Unsure if these apply to us.
         repo.delete(taskToDelete);
         return taskToDelete;
     }
