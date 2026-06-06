@@ -19,7 +19,7 @@ API documentation in the form of Swagger docs have been hosted as github pages a
 
 | Method | Path            | Purpose                |
 |--------|-----------------|------------------------|
-| GET    | /tasks/all      | List all tasks         |
+| GET    | /tasks/         | List all tasks         |
 | GET    | /tasks/{taskId} | Get a task by ID       |
 | POST   | /tasks/         | Create a task          |
 | PATCH  | /tasks/{taskId} | Update a task's status |
