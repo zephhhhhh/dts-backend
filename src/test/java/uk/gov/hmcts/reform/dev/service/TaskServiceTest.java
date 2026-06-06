@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.dev.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -29,7 +31,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class TaskServiceTest {
+@Slf4j(topic = "TaskServiceTest")
+class TaskServiceTest {
     @Mock
     private TaskRepository taskRepo;
 
@@ -79,7 +82,7 @@ public class TaskServiceTest {
         List<TaskEntity> tasks = taskService.getAllTasks();
 
         assertNotNull(tasks);
-        assertEquals(tasks.size(), 0);
+        assertEquals(0, tasks.size());
 
         verify(taskRepo).findAll();
     }
@@ -87,6 +90,20 @@ public class TaskServiceTest {
     @Test
     void getAllTasks_hasTasks_returnsAllTasks() {
         // TODO: there has got to be a better way to do this
+        List<TaskEntity> sourceList = getTaskEntities();
+
+        when(taskRepo.findAll()).thenReturn(sourceList);
+
+        List<TaskEntity> tasks = taskService.getAllTasks();
+
+        assertNotNull(tasks);
+        assertEquals(sourceList.size(), tasks.size());
+        assertArrayEquals(sourceList.toArray(), tasks.toArray());
+
+        verify(taskRepo).findAll();
+    }
+
+    private static @NonNull List<TaskEntity> getTaskEntities() {
         TaskEntity task1 = new TaskEntity(1L, "Title 1", "Description",
                                              TaskStatus.COMPLETED, TEST_TIME, TEST_TIME);
         TaskEntity task2 = new TaskEntity(2L, "Title 2", "Description",
@@ -94,17 +111,7 @@ public class TaskServiceTest {
         TaskEntity task3 = new TaskEntity(3L, "Title 3", "Description",
                                              TaskStatus.COMPLETED, TEST_TIME, TEST_TIME);
 
-        List<TaskEntity> sourceList = Arrays.asList(task1, task2, task3);
-
-        when(taskRepo.findAll()).thenReturn(sourceList);
-
-        List<TaskEntity> tasks = taskService.getAllTasks();
-
-        assertNotNull(tasks);
-        assertEquals(tasks.size(), sourceList.size());
-        assertArrayEquals(tasks.toArray(), sourceList.toArray());
-
-        verify(taskRepo).findAll();
+        return Arrays.asList(task1, task2, task3);
     }
 
     @Test

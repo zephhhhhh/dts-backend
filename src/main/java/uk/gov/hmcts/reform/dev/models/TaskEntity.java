@@ -12,7 +12,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@Data
 @Table(name = "tasks")
 public class TaskEntity {
     // TODO: Auto increment for now, potentially bad design (allows enumerating tasks), maybe use GUID?
