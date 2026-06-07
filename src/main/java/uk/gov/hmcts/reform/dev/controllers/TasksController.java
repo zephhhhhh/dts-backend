@@ -101,9 +101,6 @@ public class TasksController {
     ) {
         log.debug(":DELETE:deleteTask: deleting task with id: {}", taskId);
 
-        // TODO: Unsure on the convention of deleting entities,
-        //       just going to return the deleted entity if it was deleted for now.
-
         TaskEntity deletedTask = taskService.deleteTask(taskId);
 
         return ok(deletedTask);

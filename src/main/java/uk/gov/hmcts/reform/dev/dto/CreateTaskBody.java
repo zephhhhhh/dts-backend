@@ -33,6 +33,6 @@ public class CreateTaskBody implements ToJsonString {
     private LocalDateTime dueDate;
 
     public boolean hasDescription() {
-        return description != null && !description.trim().isBlank();
+        return description != null && !description.isBlank();
     }
 }
