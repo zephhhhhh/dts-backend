@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import uk.gov.hmcts.reform.dev.exception.JsonSchemaValidationException;
@@ -81,5 +83,33 @@ public class GlobalExceptionHandler {
             false
         );
         return responseWithProblemDetail(HttpStatus.BAD_REQUEST, problemDetail);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    public ResponseEntity<ProblemDetail> handleHttpMediaTypeNotAcceptableException(
+        HttpMediaTypeNotAcceptableException ex) {
+
+        ProblemDetail problemDetail = createProblemDetail(
+            HttpStatus.NOT_ACCEPTABLE,
+            "Not Acceptable",
+            "The requested media type cannot be produced by the server",
+            false
+        );
+
+        return responseWithProblemDetail(HttpStatus.NOT_ACCEPTABLE, problemDetail);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ProblemDetail> handleHttpMediaTypeNotSupportedException(
+        HttpMediaTypeNotSupportedException ex) {
+
+        ProblemDetail problemDetail = createProblemDetail(
+            HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+            "Unsupported Media Type",
+            "The Content-Type is not supported. Please use application/json",
+            false
+        );
+
+        return responseWithProblemDetail(HttpStatus.UNSUPPORTED_MEDIA_TYPE, problemDetail);
     }
 }
